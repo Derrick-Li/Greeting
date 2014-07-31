@@ -1,6 +1,5 @@
 package com.derrick.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -33,7 +32,7 @@ public class Server {
 	class ServerDemo extends Thread{
 
 		Socket socket;
-		BufferedReader bfer;
+		InputStreamReader in;
 		PrintWriter out;
 		String username;
 		
@@ -43,32 +42,41 @@ public class Server {
 		public ServerDemo(Socket s){
 			this.socket = s;
 		}
+		@SuppressWarnings("unused")
 		@Override
 		public void run() {
 			System.out.println("Run now!");
+			char[] bytes = new char[64];
 			try{
-				InputStreamReader in = new InputStreamReader(socket.getInputStream());
-				bfer = new BufferedReader(in);
+				in = new InputStreamReader(socket.getInputStream());
+				int len = 0;
+				StringBuffer sbr = new StringBuffer();
 				
-				String str = bfer.readLine();
-				System.out.println("the message is " + str);
+				while((len = in.read(bytes))!= -1){
+					sbr.append(bytes);
+					if(sbr.toString().lastIndexOf("===END===")>0) break;
+				}
+				String str = sbr.toString();
+				if(null != str){
+					str = str.substring(str.lastIndexOf("===BEGIN===")+11, str.lastIndexOf("===END==="));
+				}
+				System.out.println(str);
 				if(null != str){
 					prestat = conn.createStatement();
 					rs = prestat.executeQuery("select * from tb_user");
 					if(rs.next()){
 						username = rs.getString("username");
-						System.out.println(username);
 					}
 				}
 				out = new PrintWriter(socket.getOutputStream(),true);
-				out.print("message recieved -- " + username);
+				out.print(Server.class.getSimpleName()+" : " + username);
 				out.flush();
 			}catch (Exception e){
 				e.printStackTrace();
 			}finally{
 				try {
+					in.close();
 					out.close();
-					bfer.close();
 					socket.close();
 				} catch (IOException e) {
 					e.printStackTrace();
