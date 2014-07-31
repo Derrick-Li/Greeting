@@ -35,6 +35,7 @@ public class Server {
 		Socket socket;
 		BufferedReader bfer;
 		PrintWriter out;
+		String username;
 		
 		private Statement prestat = null;
 		private ResultSet rs = null;
@@ -55,12 +56,12 @@ public class Server {
 					prestat = conn.createStatement();
 					rs = prestat.executeQuery("select * from tb_user");
 					if(rs.next()){
-						String username = rs.getString("username");
+						username = rs.getString("username");
 						System.out.println(username);
 					}
 				}
 				out = new PrintWriter(socket.getOutputStream(),true);
-				out.print("message recieved");
+				out.print("message recieved -- " + username);
 				out.flush();
 			}catch (Exception e){
 				e.printStackTrace();
