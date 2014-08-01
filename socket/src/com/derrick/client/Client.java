@@ -17,7 +17,7 @@ public class Client {
 			out = new PrintWriter(socket.getOutputStream());
 			StringBuffer sbr = new StringBuffer("===BEGIN===");
 			//Append the message you want to send here
-			sbr.append("Client : hello server , can you give me a reply ?");
+			sbr.append("Client : Son of bitch , can you give me a reply ?");
 			sbr.append("===END===");
 			//Send the request 
 			out.print(sbr.toString());
